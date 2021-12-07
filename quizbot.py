@@ -51,6 +51,15 @@ bot = QuizBot(
     message_commands=True,
 )
 
+
+class Embed(discord.Embed):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.color = self.color or 0x34D5E0
+
+
+bot.Embed = Embed
+
 DPyUtils.load_extensions(bot, extra_cogs=["jishaku", "DPyUtils.ContextEditor2"])
 
 bot.run(os.getenv("QUIZBOT_TOKEN"))

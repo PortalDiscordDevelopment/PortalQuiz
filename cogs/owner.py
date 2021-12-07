@@ -18,8 +18,10 @@ class Owner(
         question: str = commands.Option(description="Question to ask"),
         correct: str = commands.Option(description="The correct answer"),
         wrong_one: str = commands.Option(description="Wrong answer #1"),
-        wrong_two: str = commands.Option(description="Wrong answer #2"),
-        wrong_three: str = commands.Option(description="Wrong answer #3"),
+        wrong_two: str = commands.Option(description="Wrong answer #2", default="null"),
+        wrong_three: str = commands.Option(
+            description="Wrong answer #3", default="null"
+        ),
     ):
         """
         Add a question to the list of questions.
