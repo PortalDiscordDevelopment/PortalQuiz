@@ -1,7 +1,7 @@
 # 2021-winter-hackathon-quiz-bot
 ## To-Do
 
-- `[Assignee: Uncreeperble]`Start Quiz Function, When a user types `/quiz <length>` is should respond with a message, with 2 buttons, a start button, and a join button.
+- `[Assignee: ]`Start Quiz Function, When a user types `/quiz <length>` is should respond with a message, with 2 buttons, a start button, and a join button.
 The start button only starts the game if the original command runner clicks it, and the join button adds the clicker to a list of players who are playing.
 
 - `[Assignee: ]`Quiz Function - After starting a game, an embed should popup with one of the <length> questions , in random order, where it would have 4 buttons attached, 
