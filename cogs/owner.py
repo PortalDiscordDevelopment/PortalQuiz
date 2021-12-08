@@ -12,6 +12,7 @@ class Owner(
         self.bot = bot
 
     @commands.command(name="add")
+    @commands.is_owner()
     async def add(
         self,
         ctx: DPyUtils.Context,
@@ -26,6 +27,12 @@ class Owner(
         """
         Add a question to the list of questions.
         """
+        async with self.bot.db.cursor() as c:
+            await c.execute(
+                "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
+                (question, correct, wrong_one, wrong_two, wrong_three),
+            )
+        await self.bot.db.commit()
         await ctx.send(
             embed=discord.Embed(
                 title="Question Added",

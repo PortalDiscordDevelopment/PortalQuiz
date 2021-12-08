@@ -9,7 +9,7 @@ class Player:
     Player class.
     """
 
-    def __init__(self, user: discord.User, totalq):
+    def __init__(self, user: discord.Member, totalq):
         self.user = user
         self.active = True
         self.score = 0

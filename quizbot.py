@@ -60,6 +60,6 @@ class Embed(discord.Embed):
 
 bot.Embed = Embed
 
-DPyUtils.load_extensions(bot, extra_cogs=["jishaku", "DPyUtils.ContextEditor2"])
+DPyUtils.load_extensions(bot, extra_cogs=["jishaku"])
 
 bot.run(os.getenv("QUIZBOT_TOKEN"))
