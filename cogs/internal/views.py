@@ -54,6 +54,12 @@ class ShowAnswers(discord.ui.View):
             self.add_item(Answer(1 if i == ind_correct else -1, label=l))
         super().__init__(**kwargs)
 
+class ShowAnswers(discord.ui.View):
+    def __init__(self, answers: list, ind_correct: int, **kwargs):
+        for i, l in enumerate("ABCD"[:len(answers)]):
+            self.add_item(Answer(1 if i == ind_correct else -1, label=l))
+        super().__init__(**kwargs)
+
 
 class JoinStartLeave(discord.ui.View):
     def __init__(self, cog: commands.Cog, totalq: int, **kwargs):
@@ -82,6 +88,7 @@ class JoinStartLeave(discord.ui.View):
     @discord.ui.button(label="Start", style=discord.ButtonStyle(1))
     async def start_game(self, btn: discord.Button, interaction: discord.Interaction):
         await interaction.response.defer()
+<<<<<<< HEAD
         if self.cog.games[interaction.guild_id]["start_by"] != interaction.user.id:
             return await interaction.followup.send(
                 "Only the person who ran the command to start this quiz can begin it early.",
@@ -129,3 +136,9 @@ class ShowAnswers(discord.ui.View):
         super().__init__(**kwargs)
         for i, l in enumerate("ABCD"[: len(answers)]):
             self.add_item(Answer(1 if i == ind_correct else -1, label=l))
+=======
+        if self.cog.games[interaction.guild_id]["start_by"] == interaction.user_id:
+            self.cog.games[interaction.guild_id]["active"] = True
+        await interaction.followup.send_message("Quiz starting now!")
+        self.stop()
+>>>>>>> ee60bdb (No message specified)
