@@ -51,20 +51,27 @@ class Quiz(commands.Cog):
             view=v,
             ephemeral=False,
         )
-        await self.bot.wait_for(
-            "quiz_start",
-            check=lambda i, m: i == ctx.guild.id and m == ctx.author.id,
-            timeout=300,
-        )
+        try:
+            await self.bot.wait_for(
+                "quiz_start",
+                check=lambda i, m: i == ctx.guild.id and m == ctx.author.id,
+                timeout=300,
+            )
+        except asyncio.TimeoutError:
+            pass
+        if len(self.games[ctx.guild.id]["participants"]) < 1:
+            return await ctx.send(f"You can't play a game with no players!")
         await ctx.send(
-            f"Game starting!\nParticipants: {', '.join(map(str,map(ctx.guild.get_member, self.games[ctx.guild.id]['participants'])))}"
+            f"Game starting!\nParticipants: {', '.join(ctx.guild.get_member(i).mention for i in self.games[ctx.guild.id]['participants'])}",
         )
         questions = [
             ("rudolph", "exists", "dead", "muskrat", "purple"),
             ("turtle", "butt", "horton"),
         ]
+        #        async with self.bot.db.cursor() as cur:
+        #            await cur.execute("SELECT question, correct, wrong_one, wrong_two, wrong_three FROM questions")
+        #            questions = await cur.fetchall()
         random.shuffle(questions)
-        await ctx.send(questions)
         qs = questions[:length]
         length = len(qs)
         for i, q in enumerate(qs):
@@ -81,17 +88,14 @@ class Quiz(commands.Cog):
             ).set_footer(text=f"Question {i+1}/{length}")
             v = Answers(self, ctx.guild, answers, i)
             await ctx.send(embed=embed, view=v)
-            await self.bot.wait_for(
-                "next_question", check=lambda g, _i: g == ctx.guild.id and _i == i
+            _, _, data = await self.bot.wait_for(
+                "next_question", check=lambda g, _i, d: g == ctx.guild.id and _i == i
             )
             nv = ShowAnswers(answers, cori)
-            embed.description = embed.description.replace(q[1], f"__{q[1]}__")
+            embed.description = f"Correct Answer: **{cor}.** {q[1]}"
             await ctx.send(embed=embed, view=nv)
             await asyncio.sleep(5)
-
-
-#        async with self.bot.db.cursor() as cur:
-#            await cur.execute("SELECT questions, correct_answer, wrong_1, wrong_2, wrong_3 FROM questions")
+        await ctx.send("this is totally final scores")
 
 
 def setup(bot: DPyUtils.Bot):

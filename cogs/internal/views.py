@@ -33,7 +33,7 @@ class Leave(discord.ui.Button):
         user = gdat["participants"].get(interaction.user.id, None)
         if not user:
             return await interaction.followup.send(
-                f"You have are not in this game.", ephemeral=True
+                "You are not in this game.", ephemeral=True
             )
         if not gdat["active"]:
             gdat["participants"].pop(user.user.id)
@@ -90,6 +90,7 @@ class Answers(discord.ui.View):
         self.ans: str = ""
         self.qnum: int = qnum
         self.answered = []
+        self.answer_data = {}
         self.participating = [
             u.user.id for u in cog.games[guild.id]["participants"].values()
         ]
@@ -104,7 +105,9 @@ class Answers(discord.ui.View):
     async def all_done(self):
         if set(self.answered) == set(self.participating):
             self.stop()
-            self.cog.bot.dispatch("next_question", self.guild.id, self.qnum)
+            self.cog.bot.dispatch(
+                "next_question", self.guild.id, self.qnum, self.answer_data
+            )
 
 
 class ShowAnswers(discord.ui.View):

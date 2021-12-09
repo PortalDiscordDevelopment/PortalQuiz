@@ -11,16 +11,9 @@ class Player:
 
     def __init__(self, user: discord.Member, totalq):
         self.user = user
-        self.active = True
-        self.score = 0
-        self.total_answered = 0
-        self.right = 0
-        self.wrong = 0
-        self.unanswered = totalq
-
-    active: bool
-    score: int
-    total_answered: int
-    right: List[str]
-    wrong: List[str]
-    unanswered: List[str]
+        self.active: bool = True
+        self.score: int = 0
+        self.total_answered: int = 0
+        self.unanswered: int = totalq
+        self.right: List[str] = []
+        self.wrong: List[str] = []
