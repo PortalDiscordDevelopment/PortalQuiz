@@ -37,6 +37,8 @@ class Leave(discord.ui.Button):
             )
         if not gdat["active"]:
             gdat["participants"].pop(user.user.id)
+            if not gdat["participants"]:
+                await self.cog.end_game(gdat)
         else:
             user.active = False
         await interaction.followup.send(f"{user.user} has left the game.")
