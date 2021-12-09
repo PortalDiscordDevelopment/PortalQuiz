@@ -48,6 +48,12 @@ class Leave(discord.ui.Button):
             user.active = False
         await interaction.followup.send(f"{user.user} has left the game.")
 
+class ShowAnswers(discord.ui.View):
+    def __init__(self, answers: list, ind_correct: int, **kwargs):
+        for i, l in enumerate("ABCD"[:len(answers)]):
+            self.add_item(Answer(1 if i == ind_correct else -1, label=l))
+        super().__init__(**kwargs)
+
 
 class JoinStartLeave(discord.ui.View):
     def __init__(self, cog: commands.Cog, totalq: int, **kwargs):
@@ -67,10 +73,11 @@ class JoinStartLeave(discord.ui.View):
                 "You are already in this game.", ephemeral=True
             )
         self.cog.games[interaction.guild_id]["participants"][
-            interaction.user.id
+            interaction.user_id
         ] = Player(interaction.user, self.totalq)
-        await interaction.followup.send(self.cog.games)
-        await interaction.followup.send(f"{interaction.user.mention} joined the game.")
+        await interaction.followup.send_message(
+            f"{interaction.user.mention} joined the game."
+        )
 
     @discord.ui.button(label="Start", style=discord.ButtonStyle(1))
     async def start_game(self, btn: discord.Button, interaction: discord.Interaction):
