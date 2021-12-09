@@ -17,6 +17,9 @@ class Answer(discord.ui.Button):
             f"Answered: {self.answer}", ephemeral=True
         )
         await self.view.all_done()
+        gdat = self.cog.games.get(interaction.guild_id, None)
+        user = gdat["participants"].get(interaction.user.id, None)
+        user.active = False
 
 
 class Leave(discord.ui.Button):
@@ -37,6 +40,10 @@ class Leave(discord.ui.Button):
             )
         if not gdat["active"]:
             gdat["participants"].pop(user.user.id)
+            if not gdat["participants"]:
+                await interaction.followup.send("The game has been termiminated due to a lack of players.")
+                await self.cog.end_game(gdat)
+                #not even sure if this exists but i didn't code this so im assuming this exists but again i didn't code this so clari pls tutorial thx
         else:
             user.active = False
         await interaction.followup.send(f"{user.user} has left the game.")

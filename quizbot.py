@@ -43,7 +43,7 @@ bot = QuizBot(
         **{
             k: v
             for k, v in dict(discord.Intents.all()).items()
-            if k not in ("presences", "messages", "members")
+            if k not in ("presences", "messages")
         }
     ),
     slash_command_guilds=os.getenv("SLASH_GUILDS").split("|"),
