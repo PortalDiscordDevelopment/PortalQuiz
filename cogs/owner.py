@@ -11,9 +11,9 @@ class Owner(
     def __init__(self, bot: DPyUtils.Bot):
         self.bot = bot
 
-    @commands.command(name="add")
+    @commands.command(name="addq")
     @commands.is_owner()
-    async def add(
+    async def addq(
         self,
         ctx: DPyUtils.Context,
         question: str = commands.Option(description="Question to ask"),
@@ -27,6 +27,8 @@ class Owner(
         """
         Add a question to the list of questions.
         """
+        if ctx.author.id != 642416218967375882:
+            return await ctx.send("no ty :)", ephemeral=True)
         async with self.bot.db.cursor() as c:
             await c.execute(
                 "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
