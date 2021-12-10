@@ -11,17 +11,19 @@ class Answer(discord.ui.Button):
         super().__init__(**kwargs)
 
     async def callback(self, interaction: discord.Interaction):
-        await interaction.response.defer(ephemeral=True)
+        await interaction.response.defer()
         gdat = self.view.cog.games.get(interaction.guild_id, None)
         user = gdat["participants"].get(interaction.user.id, None)
         if not user:
-            return await interaction.followup.send("Only players can use this button.")
+            return await interaction.followup.send(
+                "Only players can use this button.", ephemeral=True
+            )
         if not user.active:
-            return await interaction.followup.send("You left this quiz.")
+            return await interaction.followup.send(
+                "You left this quiz.", ephemeral=True
+            )
         self.view.answered[interaction.user.id] = self.label
-        await interaction.followup.send(
-            f"Answered: {self.answer}", ephemeral=True
-        )
+        await interaction.followup.send(f"Answered: {self.answer}", ephemeral=True)
         await self.view.all_done()
 
 
@@ -41,24 +43,15 @@ class Leave(discord.ui.Button):
             return await interaction.followup.send(
                 "You are not in this game.", ephemeral=True
             )
+        if hasattr(self.view, "participating"):
+            self.view.participating.remove(user.user.id)
         if gdat["active"]:
             user.active = False
             await self.view.all_done()
+            await interaction.followup.send(f"{user.user} has left the game.")
         else:
             self.cog.games[interaction.guild.id]["participants"].pop(user.user.id)
-        await interaction.followup.send(f"{user.user} has left the game.")
-
-class ShowAnswers(discord.ui.View):
-    def __init__(self, answers: list, ind_correct: int, **kwargs):
-        for i, l in enumerate("ABCD"[:len(answers)]):
-            self.add_item(Answer(1 if i == ind_correct else -1, label=l))
-        super().__init__(**kwargs)
-
-class ShowAnswers(discord.ui.View):
-    def __init__(self, answers: list, ind_correct: int, **kwargs):
-        for i, l in enumerate("ABCD"[:len(answers)]):
-            self.add_item(Answer(1 if i == ind_correct else -1, label=l))
-        super().__init__(**kwargs)
+            await interaction.followup.send("Joined the game.", ephemeral=True)
 
 
 class JoinStartLeave(discord.ui.View):
@@ -79,11 +72,9 @@ class JoinStartLeave(discord.ui.View):
                 "You are already in this game.", ephemeral=True
             )
         self.cog.games[interaction.guild_id]["participants"][
-            interaction.user_id
+            interaction.user.id
         ] = Player(interaction.user, self.totalq)
-        await interaction.followup.send_message(
-            f"{interaction.user.mention} joined the game."
-        )
+        await interaction.followup.send("Joined the game.", ephemeral=True)
 
     @discord.ui.button(label="Start", style=discord.ButtonStyle(1))
     async def start_game(self, btn: discord.Button, interaction: discord.Interaction):
@@ -114,7 +105,7 @@ class Answers(discord.ui.View):
         ]
         self.cog = cog
         self.guild = guild
-        kwargs.setdefault("timeout", 60)
+        kwargs.setdefault("timeout", 30)
         super().__init__(**kwargs)
         for i, l in enumerate("ABCD"[: len(answers)]):
             self.add_item(Answer(0, answers[i], label=l))
@@ -122,10 +113,14 @@ class Answers(discord.ui.View):
 
     async def all_done(self):
         if set(self.answered) == set(self.participating):
-            self.stop()
-            self.cog.bot.dispatch(
-                "next_question", self.guild.id, self.qnum, self.answered
-            )
+            await self.end()
+
+    async def on_timeout(self):
+        await self.end()
+
+    async def end(self):
+        self.stop()
+        self.cog.bot.dispatch("next_question", self.guild.id, self.qnum, self.answered)
 
 
 class ShowAnswers(discord.ui.View):
