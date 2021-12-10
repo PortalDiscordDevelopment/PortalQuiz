@@ -60,7 +60,7 @@ class JoinStartLeave(discord.ui.View):
         self.cog = cog
         kwargs.setdefault("timeout", 300)
         super().__init__(**kwargs)
-        self.children.insert(1, Leave(self.cog))
+        self.add_item(Leave(self.cog))
 
     @discord.ui.button(label="Join", style=discord.ButtonStyle(3))
     async def join_game(self, btn: discord.Button, interaction: discord.Interaction):

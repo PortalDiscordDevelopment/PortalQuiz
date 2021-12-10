@@ -36,7 +36,10 @@ class QuizBot(DPyUtils.Bot):
         await self.process_commands(message)
 
 
-# [687429190165069838, 721784188189016226, 720838318857781299]
+import discord, DPyUtils
+from discord.ext import commands
+
+
 bot = QuizBot(
     command_prefix=commands.when_mentioned_or("**"),
     intents=discord.Intents(
@@ -58,6 +61,18 @@ class Embed(discord.Embed):
         self.color = self.color or 0x34D5E0
 
 
+class CustomMinimalHelp(commands.MinimalHelpCommand):
+    async def send_pages(self):
+        e = self.context.bot.Embed(description="")
+        for page in self.paginator.pages:
+            e.description += page
+        await self.context.send(embed=e)
+
+
+bot.help_command = CustomMinimalHelp(
+    command_attrs={"name": "help", "aliases": ["h", "commands"]},
+    verify_checks=False,
+)
 bot.Embed = Embed
 
 DPyUtils.load_extensions(bot, extra_cogs=["jishaku"])

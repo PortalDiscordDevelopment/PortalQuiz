@@ -45,10 +45,6 @@ class Quiz(commands.Cog):
         questions = await self.get_questions()
         qs = questions[:length]
         length = len(qs)
-        await ctx.send(
-            f"Started quiz with {length} question{s(length)}.",
-            ephemeral=True,
-        )
         v = JoinStartLeave(self, length)
         await ctx.send(
             embed=self.bot.Embed(

@@ -34,14 +34,15 @@ class Owner(
             )
         await self.bot.db.commit()
         await ctx.send(
-            embed=discord.Embed(
+            embed=self.bot.Embed(
                 title="Question Added",
                 description=f"Added `{question}` to the list of questions.",
             )
             .add_field(name="Correct Answer", value=correct)
             .add_field(
                 name="Wrong Answers", value=f"{wrong_one}\n{wrong_two}\n{wrong_three}"
-            )
+            ),
+            ephemeral=True,
         )
 
 
