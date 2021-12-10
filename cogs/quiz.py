@@ -60,7 +60,7 @@ class Quiz(commands.Cog):
         except asyncio.TimeoutError:
             pass
         if len(self.games[ctx.guild.id]["participants"]) < 1:
-            return await ctx.send(f"You can't play a game with no players!")
+            return await ctx.send("You can't play a game with no players!")
         await ctx.send(
             f"Game starting!\nParticipants: {', '.join(ctx.guild.get_member(i).mention for i in self.games[ctx.guild.id]['participants'])}",
         )
@@ -89,14 +89,39 @@ class Quiz(commands.Cog):
             v = Answers(self, ctx.guild, answers, i)
             await ctx.send(embed=embed, view=v)
             _, _, data = await self.bot.wait_for(
-                "next_question", check=lambda g, _i, d: g == ctx.guild.id and _i == i
+                "next_question", check=lambda g, _i, d: g == ctx.guild.id and _i == i # pylint: disable=cell-var-from-loop
             )
+            people = self.games[ctx.guild.id]["participants"]
             nv = ShowAnswers(answers, cori)
-            embed.description = f"Correct Answer: **{cor}.** {q[1]}"
+            await self.scoring(ctx, data, cor)
+            embed.description = f"Answer: **{cor}.** {q[1]}\n\n"
+            embed.description += await self.fmt_scores(ctx)
             await ctx.send(embed=embed, view=nv)
+            if not people:
+                return  await ctx.send("Game closed due to lack of players.")
             await asyncio.sleep(5)
-        await ctx.send("this is totally final scores")
+        await ctx.send(embed=self.bot.Embed(title=f"Final Scores", description=f""))
 
+    async def scoring(self, ctx: DPyUtils.Context, data: dict, cor: str):
+        people = self.games[ctx.guild.id]["participants"]
+        for uid, p in people.items():
+            if not p.active:
+                continue
+            a = data.get(uid, None)
+            if not a:
+                p.unanswered += 1
+                continue
+            p.answered += 1
+            p.left -= 1
+            if a == cor:
+                p.score += 1
+
+    async def fmt_scores(self, ctx: DPyUtils.Context):
+        scores="__**Scores**__"
+        for i,p in enumerate(sorted(self.games[ctx.guild.id]['participants'].values(), key=lambda p: p.score),1):
+            m = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"**{i}.**"
+            scores+=f"\n{m} `{p.score}` points: {p.user}"
+        return scores
 
 def setup(bot: DPyUtils.Bot):
     bot.add_cog(Quiz(bot))

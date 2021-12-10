@@ -13,7 +13,6 @@ class Player:
         self.user = user
         self.active: bool = True
         self.score: int = 0
-        self.total_answered: int = 0
-        self.unanswered: int = totalq
-        self.right: List[str] = []
-        self.wrong: List[str] = []
+        self.answered: int = 0
+        self.unanswered: int = 0
+        self.left: int = totalq
