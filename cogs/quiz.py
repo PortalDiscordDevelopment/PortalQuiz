@@ -1,6 +1,7 @@
 """Quiz cog"""
 import asyncio
 import datetime
+import discord
 import random
 import DPyUtils
 from DPyUtils import s
@@ -51,8 +52,8 @@ class Quiz(commands.Cog):
                 title="Quiz Starting!",
                 description=f"Winter quiz beginning <t:{int(datetime.datetime.now().timestamp()+300)}:R>! Press the button below to join.",
             )
-            .set_author(name=ctx.author, icon_url=ctx.author.avatar)
-            .set_footer(text=ctx.guild, icon_url=ctx.guild.icon),
+            .set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
+            .set_footer(text=ctx.guild, icon_url=ctx.guild.icon or discord.Embed.Empty),
             view=v,
             ephemeral=False,
         )
