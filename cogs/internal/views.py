@@ -50,6 +50,7 @@ class Leave(discord.ui.Button):
             await interaction.followup.send("Joined the game.", ephemeral=True)
         people = lambda u: u.active, self.cog.games[interaction.guild.id]["participants"].values()
         if not any(people):
+            await interaction.followup.send("No one is playing... Ending the game.")
             await self.view.all_done()
 
 

@@ -99,7 +99,6 @@ class Quiz(commands.Cog):
             embed.description += await self.fmt_scores(ctx)
             await ctx.send(embed=embed, view=nv)
             if not any(people):
-                await ctx.send("Game closed due to lack of players.")
                 break
             await asyncio.sleep(5)
         await ctx.send(
