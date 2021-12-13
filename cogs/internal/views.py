@@ -48,15 +48,9 @@ class Leave(discord.ui.Button):
         else:
             self.cog.games[interaction.guild.id]["participants"].pop(user.user.id)
             await interaction.followup.send("Joined the game.", ephemeral=True)
-
-
-# class RejoinPrompt(discord.ui.View):
-#     def __init__(self, cog: commands.Cog, user: discord.User, **kwargs):
-#         super().__init__(**kwargs)
-#         self.cog = cog
-#         @discord.ui.button(label="Join", style=discord.ButtonStyle(3))
-#         async def rejoin(interaction: discord.Interaction):
-#             ...
+        people = lambda u: u.active, self.cog.games[interaction.guild.id]["participants"].values()
+        if not any(people):
+            await self.view.all_done()
 
 
 class JoinStartLeave(discord.ui.View):
