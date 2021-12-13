@@ -32,13 +32,8 @@ class QuizBot(DPyUtils.Bot):
 
     async def on_message(self, message: discord.Message):
         #        if message.author.bot or message.author.id not in self.owner_ids:
-        #            return
+        #            return # Why is this commented out?
         await self.process_commands(message)
-
-
-import discord, DPyUtils
-from discord.ext import commands
-
 
 bot = QuizBot(
     command_prefix=commands.when_mentioned_or("**"),
