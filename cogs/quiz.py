@@ -90,13 +90,13 @@ class Quiz(commands.Cog):
                 check=lambda g, _i, d: g == ctx.guild.id
                 and _i == i,  # pylint: disable=cell-var-from-loop
             )
-            people = self.games[ctx.guild.id]["participants"]
+            people = filter(lambda u: u.active, self.games[ctx.guild.id]["participants"])
             nv = ShowAnswers(answers, cori)
             await self.scoring(ctx, data, cor)
             embed.description = f"__Answer:__\n**{cor}.** {q[1]}\n\n__**Scores**__"
             embed.description += await self.fmt_scores(ctx)
             await ctx.send(embed=embed, view=nv)
-            if not people:
+            if not any(people):
                 return await ctx.send("Game closed due to lack of players.")
             await asyncio.sleep(5)
         await ctx.send(

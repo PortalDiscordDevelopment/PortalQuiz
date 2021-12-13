@@ -49,9 +49,9 @@ class Owner(
                 title="Question Added",
                 description=f"Added `{question}` to the list of questions.",
             )
-            .add_field(name="Correct Answer", value=correct)
+            .add_field(name="Correct Answer", value=f"• {correct}")
             .add_field(
-                name="Wrong Answers", value=f"{wrong_one}\n{wrong_two}\n{wrong_three}"
+                name="Wrong Answers", value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}"
             ),
             ephemeral=True,
         )
