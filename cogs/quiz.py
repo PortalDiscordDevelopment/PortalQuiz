@@ -90,7 +90,9 @@ class Quiz(commands.Cog):
                 check=lambda g, _i, d: g == ctx.guild.id
                 and _i == i,  # pylint: disable=cell-var-from-loop
             )
-            people = filter(lambda u: u.active, self.games[ctx.guild.id]["participants"])
+            people = filter(
+                lambda u: u.active, self.games[ctx.guild.id]["participants"].values()
+            )
             nv = ShowAnswers(answers, cori)
             await self.scoring(ctx, data, cor)
             embed.description = f"__Answer:__\n**{cor}.** {q[1]}\n\n__**Scores**__"

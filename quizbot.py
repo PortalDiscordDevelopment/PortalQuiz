@@ -35,6 +35,7 @@ class QuizBot(DPyUtils.Bot):
         #            return # Why is this commented out?
         await self.process_commands(message)
 
+
 bot = QuizBot(
     command_prefix=commands.when_mentioned_or("**"),
     intents=discord.Intents(
