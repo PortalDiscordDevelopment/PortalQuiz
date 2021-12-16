@@ -52,7 +52,7 @@ bot = QuizBot(
             if k not in ("presences", "messages")
         }
     ),
-    slash_command_guilds=os.getenv("SLASH_GUILDS").split("|"),
+    #    slash_command_guilds=os.getenv("SLASH_GUILDS").split("|"),
     slash_commands=True,
     message_commands=True,
 )
