@@ -1,5 +1,5 @@
 """owner-only commands"""
-import discord, os
+import os
 import DPyUtils
 from discord.ext import commands
 

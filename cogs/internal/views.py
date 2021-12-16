@@ -12,15 +12,20 @@ class Answer(discord.ui.Button):
 
     async def callback(self, interaction: discord.Interaction):
         await interaction.response.defer()
-        gdat = self.view.cog.games.get(interaction.guild_id, None)
-        user = gdat["participants"].get(interaction.user.id, None)
-        if not user or not user.active:
+        game = self.view.cog.games.get(interaction.guild_id, None)
+        if not game:
             return await interaction.followup.send(
-                "Only players can use this button.", ephemeral=True
+                "why is this button active without an associated game 🤔", ephemeral=True
             )
+        user = game.participants.get(interaction.user.id, None)
+        if not user:
+            user = Player(interaction.user)
+            game.participants[interaction.user.id] = user
         self.view.answered[interaction.user.id] = self.label
         await interaction.followup.send(f"Answered: {self.answer}", ephemeral=True)
-        await self.view.all_done()
+
+
+#        await self.view.all_done()
 
 
 class Leave(discord.ui.Button):
@@ -48,7 +53,10 @@ class Leave(discord.ui.Button):
         else:
             self.cog.games[interaction.guild.id]["participants"].pop(user.user.id)
             await interaction.followup.send("Joined the game.", ephemeral=True)
-        people = lambda u: u.active, self.cog.games[interaction.guild.id]["participants"].values()
+        people = (
+            lambda u: u.active,
+            self.cog.games[interaction.guild.id]["participants"].values(),
+        )
         if not any(people):
             await interaction.followup.send("No one is playing... Ending the game.")
             await self.view.all_done()
@@ -73,7 +81,7 @@ class JoinStartLeave(discord.ui.View):
             )
         self.cog.games[interaction.guild_id]["participants"][
             interaction.user.id
-        ] = Player(interaction.user, self.totalq)
+        ] = Player(interaction.user)
         await interaction.followup.send("Joined the game.", ephemeral=True)
 
     @discord.ui.button(label="Start", style=discord.ButtonStyle(1))
@@ -101,19 +109,20 @@ class Answers(discord.ui.View):
         self.qnum: int = qnum
         self.answered = {}
         self.participating = [
-            u.user.id for u in cog.games[guild.id]["participants"].values()
+            u.user.id for u in cog.games[guild.id].participants.values()
         ]
         self.cog = cog
         self.guild = guild
-        kwargs.setdefault("timeout", 30)
+        kwargs.setdefault("timeout", 15)
         super().__init__(**kwargs)
         for i, l in enumerate("ABCD"[: len(answers)]):
             self.add_item(Answer(0, answers[i], label=l))
-        self.add_item(Leave(cog))
 
-    async def all_done(self):
-        if set(self.answered) == set(self.participating):
-            await self.end()
+    #        self.add_item(Leave(cog))
+
+    #    async def all_done(self):
+    #        if set(self.answered) == set(self.participating):
+    #            await self.end()
 
     async def on_timeout(self):
         await self.end()
@@ -121,6 +130,7 @@ class Answers(discord.ui.View):
     async def end(self):
         self.stop()
         self.cog.bot.dispatch("next_question", self.guild.id, self.qnum, self.answered)
+        return self.answered
 
 
 class ShowAnswers(discord.ui.View):

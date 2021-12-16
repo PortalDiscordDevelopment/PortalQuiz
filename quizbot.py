@@ -7,7 +7,9 @@ import aiosqlite
 import discord
 import dotenv
 import DPyUtils
+import traceback
 from discord.ext import commands
+from schemas import schemas
 
 dotenv.load_dotenv(verbose=True)
 
@@ -28,6 +30,11 @@ class QuizBot(DPyUtils.Bot):
         ) as db, aiohttp.ClientSession() as session:
             self.db = db
             self.session = session
+            for schema in schemas:
+                try:
+                    await db.execute(schema)
+                except Exception as e:
+                    traceback.print_exception(type(e), e, e.__traceback__)
             await super().start(*args, **kwargs)
 
     async def on_message(self, message: discord.Message):
