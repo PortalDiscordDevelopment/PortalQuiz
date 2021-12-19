@@ -64,6 +64,8 @@ class Quiz(commands.Cog):
         #            pass
         for i, q in enumerate(qs):
             await asyncio.sleep(2)
+            rid = q[0]
+            q = q[1:]
             question = q[0]
             answers = list(q[1:])
             random.shuffle(answers)
@@ -74,10 +76,13 @@ class Quiz(commands.Cog):
                 description="\n\n".join(
                     f"**{chr(65+n)}.** {a}" for n, a in enumerate(answers)
                 ),
-            ).set_footer(text=f"Question {i+1}/{length} | 15 seconds to answer!")
+            ).set_footer(
+                text=f"Question {i+1}/{length} (ID: {rid}) | 15 seconds to answer!"
+            )
             v = Answers(self, ctx.guild, answers, i)
             await ctx.send(embed=embed, view=v)
             self.games[ctx.guild.id].current_view = v
+            self.games[ctx.guild.id].q_start = datetime.datetime.now().timestamp()
             try:
                 _, _, data = await self.bot.wait_for(
                     "next_question",
@@ -104,12 +109,13 @@ class Quiz(commands.Cog):
                 title="Final Scores", description=await self.fmt_scores(ctx, True)
             )
         )
+        self.games[ctx.guild.id].active = False
 
     async def get_questions(self):
         questions = []
         async with self.bot.db.cursor() as cur:
             await cur.execute(
-                "SELECT question, correct, wrong_one, wrong_two, wrong_three FROM questions"
+                "SELECT ROWID, question, correct, wrong_one, wrong_two, wrong_three FROM questions"
             )
             data = await cur.fetchall()
             for q in data:
@@ -123,13 +129,16 @@ class Quiz(commands.Cog):
     async def scoring(self, ctx: DPyUtils.Context, data: dict, cor: str):
         people = self.games[ctx.guild.id].participants
         for uid, p in people.items():
-            a = data.get(uid, None)
+            a, t = data.get(uid, ["", 0])
             if not a:
                 p.unanswered += 1
                 continue
             p.answered += 1
+            this_score = 0
             if a == cor:
-                p.score += 1
+                this_score = round((15 - (t - self.games[ctx.guild.id].q_start)) * 4)
+                p.score += this_score
+            p.up_by = this_score
 
     async def fmt_scores(self, ctx: DPyUtils.Context, final: bool = False):
         scores = ""
@@ -143,9 +152,11 @@ class Quiz(commands.Cog):
         ):
             m = "🥇" if i == 1 else "🥈" if i == 2 else "🥉" if i == 3 else f"**{i}.**"
             if final and i == 1:
-                scores += f"🏆 **Winner!** {p.user} with {p.score} points.\n"
+                scores += f"🏆 **Winner!**\n{p.user} with {p.score} points.\n"
             else:
-                scores += f"\n{m} `{p.score}` point{s(p.score)}: {p.user}"
+                scores += (
+                    f"\n{m} `{p.score}` point{s(p.score)} (`+{p.up_by}`): {p.user}"
+                )
         return scores
 
     @commands.command(name="endquiz")

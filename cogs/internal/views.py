@@ -1,3 +1,4 @@
+import datetime
 import discord
 from discord.ext import commands
 from .classes import Player
@@ -21,7 +22,10 @@ class Answer(discord.ui.Button):
         if not user:
             user = Player(interaction.user)
             game.participants[interaction.user.id] = user
-        self.view.answered[interaction.user.id] = self.label
+        self.view.answered[interaction.user.id] = [
+            self.label,
+            datetime.datetime.now().timestamp(),
+        ]
         await interaction.followup.send(f"Answered: {self.answer}", ephemeral=True)
 
 

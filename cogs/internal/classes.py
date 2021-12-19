@@ -12,6 +12,7 @@ class Player:
     def __init__(self, user: discord.Member):
         self.user = user
         self.score: int = 0
+        self.up_by: int = 0
         self.answered: int = 0
         self.unanswered: int = 0
 
