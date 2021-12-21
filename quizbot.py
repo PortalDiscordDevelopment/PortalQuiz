@@ -10,6 +10,9 @@ import DPyUtils
 import traceback
 from discord.ext import commands
 from schemas import schemas
+import datetime
+from pytz import timezone
+
 
 dotenv.load_dotenv(verbose=True)
 
@@ -41,6 +44,7 @@ class QuizBot(DPyUtils.Bot):
         #        if message.author.bot or message.author.id not in self.owner_ids:
         #            return # Why is this commented out?
         await self.process_commands(message)
+    
 
 
 bot = QuizBot(
@@ -77,6 +81,23 @@ bot.help_command = CustomMinimalHelp(
     verify_checks=False,
 )
 bot.Embed = Embed
+#when joining a server, send a hello message
+@bot.listen()
+async def on_guild_join(self, guild: discord.Guild):
+    here = timezone('America/New_York')
+    date_time = datetime.datetime.now(here)
+    em = bot.Embed(title = "Thank You for Inviting!", description="Thank you for inviting **Winter Quiz**. To begin, please run `/quiz`. Run `/help` to see information about the other commands.")
+    em.set_author(name=bot.user.name, icon_url = bot.user.avatar.url)
+    em.timestamp = date_time
+    bot_entry = await guild.audit_logs(action=discord.AuditLogAction.bot_add).flatten()
+    inviter = bot_entry[0].user
+    reciever = (
+    discord.utils.find(lambda c: "staff" in c.name and "chat" in c.name, guild.text_channels) or
+    inviter or guild.owner or guild.system_channel)
+    if reciever:
+        await reciever.send(embed = em)
+    if not reciever:
+        print("In " + guild.name + " the owners really fucked up, and I can't find a channel to send the message to.")
 
 DPyUtils.load_extensions(bot, extra_cogs=["jishaku"])
 
