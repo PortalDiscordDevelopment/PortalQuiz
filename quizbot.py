@@ -96,8 +96,10 @@ async def on_guild_join(self, guild: discord.Guild):
     inviter or guild.owner or guild.system_channel)
     if reciever:
         await reciever.send(embed = em)
-    if not reciever:
+    elif not reciever:
         print("In " + guild.name + " the owners really fucked up, and I can't find a channel to send the message to.")
+    else:
+        print("Really shouldn't be printed")
 
 DPyUtils.load_extensions(bot, extra_cogs=["jishaku"])
 
