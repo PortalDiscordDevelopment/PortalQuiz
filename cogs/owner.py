@@ -54,7 +54,8 @@ class Owner(
         """
         Set the Version of the Bot
         """
-        Version(version)
+        v = Version(version)
+        await ctx.send(view=v)
 
 
 
