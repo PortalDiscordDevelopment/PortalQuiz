@@ -8,6 +8,7 @@ from DPyUtils import s
 from discord.ext import commands
 from cogs.internal.views import JoinStartLeave, Answers, ShowAnswers
 from cogs.internal.classes import Game
+import json
 
 
 class Quiz(commands.Cog):
@@ -35,11 +36,18 @@ class Quiz(commands.Cog):
         """
         Shows information about the Bot.
         """
+        def get_version() -> str:
+            with open('data.json', 'r') as f:
+                return json.loads(f.read())['version']
+        
+        version = get_version()
+
         await ctx.send(
             embed=self.bot.Embed(
                 title="Winter Quiz",
                 description=f"""
                     **Stats:**
+                    Version: {version}
                     Server Count: {len(self.bot.guilds)} servers
                     Director: Thomas Morton
                     Developers: {', '.join(map(str, map(self.bot.get_user, (642416218967375882, 511655498676699136))))}

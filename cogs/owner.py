@@ -2,7 +2,8 @@
 import os
 import DPyUtils
 from discord.ext import commands
-
+import json
+from cogs.internal.views import Version
 
 class Owner(
     commands.Cog,
@@ -47,6 +48,14 @@ class Owner(
             ),
             ephemeral=True,
         )
+    @commands.command(name="setversion")
+    @commands.is_owner()
+    async def setversion(self, ctx: DPyUtils.Context, version: str):
+        """
+        Set the Version of the Bot
+        """
+        Version(version)
+
 
 
 def setup(bot: DPyUtils.Bot):
