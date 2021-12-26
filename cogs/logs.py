@@ -13,17 +13,15 @@ class Logging(commands.Cog):
 
     @commands.Cog.listener("on_guild_join")
     @commands.Cog.listener("on_guild_remove")
-    async def on_guild_join(self, guild: discord.Guild):
+    async def guild_logs(self, guild: discord.Guild):
         c = self.bot.get_channel(922487263630327838)
-        jl = "Joined" if self.bot.get_guild(guild.id) else "Left"
-        tr = "Total" if self.bot.get_guild(guild.id) else "Remaining"
-        embed = self.bot.Embed(title=f"{jl} {guild}")
-        embed.set_author(author=self.bot.user.name, icon_url=self.bot.user.avatar.url)
-        embed.add_field(name="Owner:", value=guild.owner)
-        embed.add_field(name=f"{tr} Servers:", value=len(self.bot.guilds),inline=True)
-        embed.add_field(name="Guild ID:", value=f"'{guild.id}'", inline=False)
-        embed.add_field(name="Humans:", value=len([m for m in guild.members if not m.bot]),inline=True)
-        embed.add_field(name="Bots:", value=len([m for m in guild.members if m.bot]), inline=True)
+        jl,clr = ("Joined", "green") if self.bot.get_guild(guild.id) else ("Left", "red")
+        embed = self.bot.Embed(title=f"{jl} {guild}", color=getattr(discord.Color, "dark_"+clr)(),description=f"""
+Guild ID: `{guild.id}`
+Owner: `{guild.owner}` (`{guild.owner.id}`)
+Humans: `{len([m for m in guild.members if not m.bot])}`
+Bots: `{len([m for m in guild.members if m.bot])}`
+Total Guilds: `{len(bot.guilds)}`""")
         await c.send(embed=embed)
 
     @commands.Cog.listener()
