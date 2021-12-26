@@ -16,9 +16,15 @@ class Logging(commands.Cog):
     async def on_guild_join(self, guild: discord.Guild):
         c = self.bot.get_channel(922487263630327838)
         jl = "Joined" if self.bot.get_guild(guild.id) else "Left"
-        await c.send(
-            f"{jl} {guild}, Owner: {guild.owner}\nTotal: {len(self.bot.guilds)}"
-        )
+        tr = "Total" if self.bot.get_guild(guild.id) else "Remaining"
+        embed = self.bot.Embed(title=f"{jl} {guild}")
+        embed.set_author(author=self.bot.user.name, icon_url=self.bot.user.avatar.url)
+        embed.add_field(name="Owner:", value=guild.owner)
+        embed.add_field(name=f"{tr} Servers:", value=len(self.bot.guilds),inline=True)
+        embed.add_field(name="Guild ID:", value=f"'{guild.id}'", inline=False)
+        embed.add_field(name="Humans:", value=len([m for m in guild.members if not m.bot]),inline=True)
+        embed.add_field(name="Bots:", value=len([m for m in guild.members if m.bot]), inline=True)
+        await c.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_command(self, ctx: DPyUtils.Context):
