@@ -1,12 +1,11 @@
 """Quiz cog"""
 import asyncio
 import datetime
-import discord
 import random
 import DPyUtils
 from DPyUtils import s
 from discord.ext import commands
-from cogs.internal.views import JoinStartLeave, Answers, ShowAnswers
+from cogs.internal.views import Answers, ShowAnswers
 from cogs.internal.classes import Game
 import json
 
@@ -72,7 +71,6 @@ class Quiz(commands.Cog):
                 "scope=applications.commands%20bot)",
             )
         )
-
     @commands.command(name="quiz")
     async def quiz(
         self,
@@ -82,6 +80,8 @@ class Quiz(commands.Cog):
         """
         Starts a Christmas-themed quiz.
         """
+        if length < 1:
+            return await ctx.send("You need a minimum of 1 question.")
         self.games[ctx.guild.id] = Game(ctx)
         questions = await self.get_questions()
         qs = questions[:length]
