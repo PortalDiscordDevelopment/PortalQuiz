@@ -2,6 +2,10 @@
 import os
 import DPyUtils
 from discord.ext import commands
+import json
+from cogs.internal.views import Version
+import datetime
+from pytz import timezone
 
 
 class Owner(
@@ -47,6 +51,20 @@ class Owner(
             ),
             ephemeral=True,
         )
+    @commands.command(name="setversion")
+    @commands.is_owner()
+    async def setversion(self, ctx: DPyUtils.Context, version: str):
+        """
+        Set the Version of the Bot
+        """
+        here = timezone('America/New_York')
+        date_time = datetime.datetime.now(here)
+        embed = self.bot.Embed(title="Confirmation", description = f"Are you sure you want to set the version to {version}?")
+        embed.set_author(name=f"{ctx.author.name}", icon_url=ctx.author.avatar_url)
+        embed.timestamp = date_time
+        v = Version(version)
+        await ctx.send(embed=embed, view=v)
+
 
 
 def setup(bot: DPyUtils.Bot):

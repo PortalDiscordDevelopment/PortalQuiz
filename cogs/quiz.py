@@ -7,6 +7,7 @@ from DPyUtils import s
 from discord.ext import commands
 from cogs.internal.views import Answers, ShowAnswers
 from cogs.internal.classes import Game
+import json
 
 
 class Quiz(commands.Cog):
@@ -29,6 +30,47 @@ class Quiz(commands.Cog):
         self.bot = bot
         self.games = {}
 
+    @commands.command(name="info")
+    async def info(self, ctx: DPyUtils.Context):
+        """
+        Shows information about the Bot.
+        """
+        def get_version() -> str:
+            with open('data.json', 'r') as f:
+                return json.loads(f.read())['version']
+        
+        version = get_version()
+
+        await ctx.send(
+            embed=self.bot.Embed(
+                title="Winter Quiz",
+                description=f"""
+                    **Stats:**
+                    Version: {version}
+                    Server Count: {len(self.bot.guilds)} servers
+                    Director: Thomas Morton
+                    Developers: {', '.join(map(str, map(self.bot.get_user, (642416218967375882, 511655498676699136))))}
+                    Framework: [enhanced-discord.py](https://github.com/iDevision/enhanced-discord.py)
+                    """.replace(
+                    "    ", ""
+                )
+            )
+        )
+
+    @commands.command(name="invite")
+    async def invite(self, ctx: DPyUtils.Context):
+        """
+        Invite the bot to your server.
+        """
+        await ctx.send(
+            embed=self.bot.Embed(
+                title="Invite the bot to your server",
+                description="[Click here to invite the bot to your server.]"
+                "(https://discord.com/api/oauth2/authorize?"
+                "client_id=871981757531050064&permissions=412317240384&"
+                "scope=applications.commands%20bot)",
+            )
+        )
     @commands.command(name="quiz")
     async def quiz(
         self,
