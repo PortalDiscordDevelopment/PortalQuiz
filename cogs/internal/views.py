@@ -144,23 +144,22 @@ class ShowAnswers(discord.ui.View):
         for i, l in enumerate("ABCD"[: len(answers)]):
             self.add_item(Answer(1 if i == ind_correct else -1, label=l))
 
+
 class Version(discord.ui.View):
     def __init__(self, version: str, **kwargs):
         super().__init__(**kwargs)
         self.version = version
-    @discord.ui.button(label='Yes', style=discord.ButtonStyle(3))
+
+    @discord.ui.button(label="Yes", style=discord.ButtonStyle(3))
     async def yes(self, btn: discord.Button, interaction: discord.Interaction):
-        with open('/home/clari/Repositories/Winter-Hackathon/data.json', 'r+') as f:
+        with open("/home/clari/Repositories/Winter-Hackathon/data.json", "r+") as f:
             d = json.loads(f.read())
-            d['version'] = self.version
+            d["version"] = self.version
             f.seek(0)
             f.write(json.dumps(d, indent=4))
             f.truncate()
         await interaction.followup.send_message(f"Version set to {self.version}")
-    
-    @discord.ui.button(label='No', style=discord.ButtonStyle(4))
+
+    @discord.ui.button(label="No", style=discord.ButtonStyle(4))
     async def no(self, btn: discord.Button, interaction: discord.Interaction):
         await interaction.followup.send_message("Version not set.")
-            
-        
-

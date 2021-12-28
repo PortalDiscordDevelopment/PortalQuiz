@@ -1,3 +1,4 @@
+"""a file to store all the db schemas lol"""
 schemas = [
     """CREATE TABLE IF NOT EXISTS questions (
     id INTEGER PRIMARY KEY,
