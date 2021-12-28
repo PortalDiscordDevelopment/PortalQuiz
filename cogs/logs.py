@@ -26,7 +26,7 @@ Guild ID: `{guild.id}`
 Owner: `{guild.owner}` (`{guild.owner.id}`)
 Humans: `{len([m for m in guild.members if not m.bot])}`
 Bots: `{len([m for m in guild.members if m.bot])}`
-Total Guilds: `{len(bot.guilds)}`""",
+Total Guilds: `{len(self.bot.guilds)}`""",
         )
         await c.send(embed=embed)
 
