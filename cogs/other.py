@@ -76,6 +76,7 @@ class Other(commands.Cog):
             if isinstance(e, CommandOnCooldown):
                 pass
             else:
+                c2 = self.bot.get_channel(922487263919767573)
                 error = self.bot.Embed(
                     title=f"Error while running command ('{ctx.command}')",
                     description=f"{e}",
@@ -86,7 +87,7 @@ class Other(commands.Cog):
                     description="Sorry, an error has occured while running this command. Try again in a few minutes, a traceback has been sent to the developers.",
                     color = discord.Color.dark_red()
                 )
-                await c.send(embed=error)
+                await c2.send(embed=error)
                 await ctx.send(embed=usererror)
         
 
