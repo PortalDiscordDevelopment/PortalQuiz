@@ -159,7 +159,74 @@ class Version(discord.ui.View):
             f.write(json.dumps(d, indent=4))
             f.truncate()
         await interaction.followup.send_message(f"Version set to {self.version}")
+        self.stop()
 
     @discord.ui.button(label="No", style=discord.ButtonStyle(4))
     async def no(self, btn: discord.Button, interaction: discord.Interaction):
         await interaction.followup.send_message("Version not set.")
+        self.stop()
+
+class AcceptSuggestion(discord.ui.View):
+    def __init__(self, suggestor_id: int, question: str, correct: str, wrong_one: str, wrong_two = "null", wrong_three = "null", **kwargs):
+        super().__init__(**kwargs)
+        self.question = question
+        self.correct = correct
+        self.wrong_one = wrong_one
+        self.wrong_two = wrong_two
+        self.wrong_three = wrong_three
+        self.suggestor_id = suggestor_id
+
+    @discord.ui.button(label="Yes", style=discord.ButtonStyle(3))
+    async def yes(self, btn: discord.Button, interaction: discord.Interaction):
+        if interaction.user.id != 642416218967375882:
+            return await interaction.followup.send_message("no ty :)", ephemeral=True)
+        if isinstance(self.wrong_two, int):
+            self.wrong_two = str(self.wrong_two)
+        if isinstance(self.wrong_three, int):
+            self.wrong_three = str(self.wrong_three) 
+        async with self.bot.db.cursor() as c:
+            await c.execute(
+                "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
+                (self.question, self.correct, self.wrong_one, self.wrong_two, self.wrong_three),
+            )
+        await self.bot.db.commit()
+        await interaction.followup.send_message(
+            embed=self.bot.Embed(
+                title="Question Added",
+                description=f"Added `{self.question}` to the list of questions.",
+            )
+            .add_field(name="Correct Answer", value=f"• {self.correct}")
+            .add_field(
+                name="Wrong Answers",
+                value=f"• {self.wrong_one}\n• {self.wrong_two}\n• {self.wrong_three}",
+            ),
+            ephemeral=True,
+        )
+        em = self.bot.Embed(
+            title="Suggestion Accepted",
+            description=f"A developer has accepted your suggestion for {self.bot.mention}."
+        )
+        em.add_field(name="Question", value=f"{self.question}")
+        em.add_field(name="Correct Answer", value=f"{self.correct}")
+        em.add_field(name="Wrong Answers", value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}")
+        try:
+            await self.bot.get_user(self.suggestor_id).send(embed=em)
+        except:
+            pass
+        self.stop()
+
+    @discord.ui.button(label="No", style=discord.ButtonStyle(4))
+    async def no(self, btn: discord.Button, interaction: discord.Interaction):
+        await interaction.followup.send_message("Suggestion not accepted.")
+        embed = self.bot.Embed(
+            title="Suggestion not accepted",
+            description=f"Your Suggestion for {self.bot.user.mention} was not accepted.",
+        )
+        embed.add_field(name="Suggested Question", value=f"{self.question}")
+        embed.add_field(name="Correct Answer", value=f"{self.correct}")
+        embed.add_field(name="Wrong Answers", value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}")
+        try:
+            await self.bot.get_user(self.suggestor_id).send(embed=embed)
+        except:
+            pass
+        self.stop()
