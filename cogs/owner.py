@@ -64,7 +64,7 @@ class Owner(
             title="Confirmation",
             description=f"Are you sure you want to set the version to {version}?",
         )
-        embed.set_author(name=f"{ctx.author.name}", icon_url=ctx.author.avatar_url)
+        embed.set_author(name=f"{ctx.author.name}", icon_url=ctx.author.avatar.url)
         embed.timestamp = date_time
         v = Version(version)
         await ctx.send(embed=embed, view=v)
