@@ -94,15 +94,14 @@ class Other(commands.Cog):
             ephemeral=True,
         )
         await c.send(
-            embed=sent,
-            view=self.bot.Embed(
+            embed=self.bot.Embed(
                 title="Question Suggested",
                 description="```\n/addq\n"
                 f"correct: {correct}\n"
                 f"wrong_one: {wrong_one}\n"
                 f"wrong_two: {wrong_two}\n"
                 f"wrong_three: {wrong_three}\n",
-            ),
+            )
         )
 
 
