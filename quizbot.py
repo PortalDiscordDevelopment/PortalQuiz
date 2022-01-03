@@ -92,6 +92,6 @@ async def on_guild_join(self, guild: discord.Guild):
         print("Really shouldn't be printed")
 
 
-DPyUtils.load_extensions(bot, skip=["cogs.logs"])
+DPyUtils.load_extensions(bot)
 
 bot.run(os.getenv("QUIZBOT_TOKEN"))

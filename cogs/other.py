@@ -53,6 +53,13 @@ class Other(commands.Cog):
             )
         )
 
+    @commands.command(name="ping")
+    async def ping(self, ctx: DPyUtils.Context):
+        """
+        Gets bot latency.
+        """
+        await ctx.send(f"Pong! {round(self.bot.latency * 1000)}ms")
+
     @commands.command(name="suggestq")
     @commands.cooldown(1, 60, commands.BucketType.user)
     async def suggestq(
@@ -73,28 +80,30 @@ class Other(commands.Cog):
         Suggest a question
         """
         c = self.bot.get_channel(925420070774124565)
-        v = AcceptSuggestion(
-            ctx.author.id, question, correct, wrong_one, wrong_two, wrong_three
+        await ctx.send(
+            embed=self.bot.Embed(
+                title="Question Suggested",
+                description=f"Suggested `{question}` to the developers.",
+            )
+            .add_field(name="Correct Answer", value=f"• {correct}")
+            .add_field(
+                name="Wrong Answers",
+                value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}",
+            )
+            .add_field(name="Season", value=f"{season}"),
+            ephemeral=True,
         )
-        embed = self.bot.Embed(
-            title="Question Suggested",
-            description=f"Suggested `{question}` to the developers.",
+        await c.send(
+            embed=sent,
+            view=self.bot.Embed(
+                title="Question Suggested",
+                description="```\n/addq\n"
+                f"correct: {correct}\n"
+                f"wrong_one: {wrong_one}\n"
+                f"wrong_two: {wrong_two}\n"
+                f"wrong_three: {wrong_three}\n",
+            ),
         )
-        embed.add_field(name="Correct Answer", value=f"• {correct}")
-        embed.add_field(
-            name="Wrong Answers", value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}"
-        )
-        embed.add_field(name="Season", value=f"{season}")
-
-        sent = self.bot.Embed(title="Question Suggested", description=f"New Suggestion")
-        sent.add_field(name="Question", value=f"{question}")
-        sent.add_field(name="Correct Answer", value=f"• {correct}")
-        sent.add_field(
-            name="Wrong Answers", value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}"
-        )
-        sent.add_field(name="Season", value=f"{season}")
-        await ctx.send(embed=embed, ephemeral=True)
-        await c.send(embed=sent, view=v)
 
 
 def setup(bot: DPyUtils.Bot):
