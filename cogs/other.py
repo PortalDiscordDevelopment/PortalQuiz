@@ -1,6 +1,8 @@
 import DPyUtils
 import json
+import discord
 from discord.ext import commands
+from cogs.internal.views import AcceptSuggestion
 
 
 class Other(commands.Cog):
@@ -51,6 +53,38 @@ class Other(commands.Cog):
             )
         )
 
+    @commands.command(name="suggestq")
+    @commands.cooldown(1,60, commands.BucketType.user)
+    async def suggestq(
+        self,
+        ctx: DPyUtils.Context,
+        question: str = commands.Option(description="Question to ask"),
+        correct: str = commands.Option(description="The correct answer"),
+        wrong_one: str = commands.Option(description="Wrong answer #1"),
+        wrong_two: str = commands.Option(description="Wrong answer #2", default="null"),
+        wrong_three: str = commands.Option(description="Wrong answer #3", default="null"),
+        season: str = commands.Option(description="The time of year this question should appear" )
+    ):
+        """
+        Suggest a question
+        """
+        c = self.bot.get_channel(925420070774124565)
+        v = AcceptSuggestion(ctx.author.id, question, correct, wrong_one, wrong_two, wrong_three)
+        embed = self.bot.Embed(
+                title="Question Suggested",
+                description=f"Suggested `{question}` to the developers.")
+        embed.add_field(name="Correct Answer", value=f"• {correct}")
+        embed.add_field(name="Wrong Answers", value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}")
+        embed.add_field(name="Season", value=f"{season}")
 
+        sent = self.bot.Embed(
+                title="Question Suggested",
+                description=f"New Suggestion")
+        sent.add_field(name="Question", value=f"{question}")
+        sent.add_field(name="Correct Answer", value=f"• {correct}")
+        sent.add_field(name="Wrong Answers", value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}")
+        sent.add_field(name="Season", value=f"{season}")
+        await ctx.send(embed=embed, ephemeral=True)
+        await c.send(embed=sent, view=v)
 def setup(bot: DPyUtils.Bot):
     bot.add_cog(Other(bot))
