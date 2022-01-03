@@ -158,13 +158,14 @@ class Version(discord.ui.View):
             f.seek(0)
             f.write(json.dumps(d, indent=4))
             f.truncate()
+        await interaction.followup.send_message(f"Version set to {self.version}")
         self.stop()
-        return await interaction.followup.send_message(f"Version set to {self.version}")
+        
 
     @discord.ui.button(label="No", style=discord.ButtonStyle(4))
     async def no(self, btn: discord.Button, interaction: discord.Interaction):
+        await interaction.followup.send_message("Version not set.")
         self.stop()
-        return await interaction.followup.send_message("Version not set.")
 
 
 class AcceptSuggestion(discord.ui.View):
