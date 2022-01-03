@@ -160,15 +160,24 @@ class Version(discord.ui.View):
             f.truncate()
         self.stop()
         return await interaction.followup.send_message(f"Version set to {self.version}")
-        
 
     @discord.ui.button(label="No", style=discord.ButtonStyle(4))
     async def no(self, btn: discord.Button, interaction: discord.Interaction):
         self.stop()
         return await interaction.followup.send_message("Version not set.")
 
+
 class AcceptSuggestion(discord.ui.View):
-    def __init__(self, suggestor_id: int, question: str, correct: str, wrong_one: str, wrong_two = "null", wrong_three = "null", **kwargs):
+    def __init__(
+        self,
+        suggestor_id: int,
+        question: str,
+        correct: str,
+        wrong_one: str,
+        wrong_two="null",
+        wrong_three="null",
+        **kwargs,
+    ):
         super().__init__(**kwargs)
         self.question = question
         self.correct = correct
@@ -184,11 +193,17 @@ class AcceptSuggestion(discord.ui.View):
         if isinstance(self.wrong_two, int):
             self.wrong_two = str(self.wrong_two)
         if isinstance(self.wrong_three, int):
-            self.wrong_three = str(self.wrong_three) 
+            self.wrong_three = str(self.wrong_three)
         async with self.bot.db.cursor() as c:
             await c.execute(
                 "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
-                (self.question, self.correct, self.wrong_one, self.wrong_two, self.wrong_three),
+                (
+                    self.question,
+                    self.correct,
+                    self.wrong_one,
+                    self.wrong_two,
+                    self.wrong_three,
+                ),
             )
         await self.bot.db.commit()
         await interaction.followup.send_message(
@@ -205,11 +220,14 @@ class AcceptSuggestion(discord.ui.View):
         )
         em = self.bot.Embed(
             title="Suggestion Accepted",
-            description=f"A developer has accepted your suggestion for {self.bot.mention}."
+            description=f"A developer has accepted your suggestion for {self.bot.mention}.",
         )
         em.add_field(name="Question", value=f"{self.question}")
         em.add_field(name="Correct Answer", value=f"{self.correct}")
-        em.add_field(name="Wrong Answers", value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}")
+        em.add_field(
+            name="Wrong Answers",
+            value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}",
+        )
         try:
             await self.bot.get_user(self.suggestor_id).send(embed=em)
         except:
@@ -225,7 +243,10 @@ class AcceptSuggestion(discord.ui.View):
         )
         embed.add_field(name="Suggested Question", value=f"{self.question}")
         embed.add_field(name="Correct Answer", value=f"{self.correct}")
-        embed.add_field(name="Wrong Answers", value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}")
+        embed.add_field(
+            name="Wrong Answers",
+            value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}",
+        )
         try:
             await self.bot.get_user(self.suggestor_id).send(embed=embed)
         except:
