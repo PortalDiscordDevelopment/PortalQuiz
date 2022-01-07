@@ -1,8 +1,9 @@
 import datetime
+import json
 import discord
+import DPyUtils
 from discord.ext import commands
 from .classes import Player
-import json
 
 
 class Answer(discord.ui.Button):
@@ -158,19 +159,22 @@ class Version(discord.ui.View):
             f.seek(0)
             f.write(json.dumps(d, indent=4))
             f.truncate()
-        self.stop()
-        return await interaction.followup.send_message(f"Version set to {self.version}")
+        return await interaction.response.edit_message(
+            f"Version set to {self.version}", view=None, embed=None
+        )
 
     @discord.ui.button(label="No", style=discord.ButtonStyle(4))
     async def no(self, btn: discord.Button, interaction: discord.Interaction):
-        self.stop()
-        return await interaction.followup.send_message("Version not set.")
+        return await interaction.response.edit_message(
+            "Version not set.", view=None, embed=None
+        )
 
 
 class AcceptSuggestion(discord.ui.View):
     def __init__(
         self,
-        suggestor_id: int,
+        bot: DPyUtils.Bot,
+        suggester_id: int,
         question: str,
         correct: str,
         wrong_one: str,
@@ -179,21 +183,18 @@ class AcceptSuggestion(discord.ui.View):
         **kwargs,
     ):
         super().__init__(**kwargs)
+        self.bot = bot
         self.question = question
         self.correct = correct
         self.wrong_one = wrong_one
         self.wrong_two = wrong_two
         self.wrong_three = wrong_three
-        self.suggestor_id = suggestor_id
+        self.suggester_id = suggester_id
 
     @discord.ui.button(label="Yes", style=discord.ButtonStyle(3))
     async def yes(self, btn: discord.Button, interaction: discord.Interaction):
         if interaction.user.id != 642416218967375882:
             return await interaction.followup.send_message("no ty :)", ephemeral=True)
-        if isinstance(self.wrong_two, int):
-            self.wrong_two = str(self.wrong_two)
-        if isinstance(self.wrong_three, int):
-            self.wrong_three = str(self.wrong_three)
         async with self.bot.db.cursor() as c:
             await c.execute(
                 "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
@@ -229,7 +230,7 @@ class AcceptSuggestion(discord.ui.View):
             value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}",
         )
         try:
-            await self.bot.get_user(self.suggestor_id).send(embed=em)
+            await self.bot.get_user(self.suggester_id).send(embed=em)
         except:
             pass
         self.stop()
@@ -248,7 +249,7 @@ class AcceptSuggestion(discord.ui.View):
             value=f"{self.wrong_one}\n{self.wrong_two}\n{self.wrong_three}",
         )
         try:
-            await self.bot.get_user(self.suggestor_id).send(embed=embed)
+            await self.bot.get_user(self.suggester_id).send(embed=embed)
         except:
             pass
         self.stop()
