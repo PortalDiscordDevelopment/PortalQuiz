@@ -54,9 +54,9 @@ bot = QuizBot(
     slash_commands=True,
     message_commands=True,
     color=0x34D5E0,
-    guild_logs=922487263630327838,
-    error_logs=922487263919767573,
-    command_logs=922487264775385118,
+    guild_logs=933694555205824612,
+    error_logs=933694555742670878,
+    command_logs=933694556266962964,
 )
 
 # when joining a server, send a hello message
