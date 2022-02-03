@@ -79,7 +79,7 @@ class Other(commands.Cog):
         """
         Suggest a question
         """
-        c = self.bot.get_channel(925420070774124565)
+        c = self.bot.get_channel(938852082537103411)
         await ctx.send(
             embed=self.bot.Embed(
                 title="Question Suggested",
