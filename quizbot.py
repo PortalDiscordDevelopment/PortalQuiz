@@ -50,6 +50,12 @@ bot = QuizBot(
             if k not in ("presences")
         }
     ),
+    owner_ids={
+        642416218967375882,
+        428903502283014145,
+        511655498676699136,
+        680801389936508977,
+    },
     #    slash_command_guilds=os.getenv("SLASH_GUILDS").split("|"),
     slash_commands=True,
     message_commands=True,
