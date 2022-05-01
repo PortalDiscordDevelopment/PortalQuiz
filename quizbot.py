@@ -66,7 +66,8 @@ bot = QuizBot(
 )
 
 # when joining a server, send a hello message
-@bot.listen()
+# sparrow im commenting out this line until you fix the `self` and add permission checks
+# @bot.listen()
 async def on_guild_join(self, guild: discord.Guild):
     here = timezone("America/New_York")
     date_time = datetime.datetime.now(here)
