@@ -1,43 +1,55 @@
 """owner-only commands"""
-import datetime
 import os
+
+import discord
 import DPyUtils
+from discord import app_commands
 from discord.ext import commands
-from cogs.internal.views import Version
+
+from cogs.internal.checks import is_owner
 
 
-class Owner(
-    commands.Cog,
-    command_attrs={"slash_command_guilds": os.getenv("SLASH_GUILDS").split("|")},
-):
+class Owner(commands.Cog):
+    """
+    Owner commands
+    """
+
     def __init__(self, bot: DPyUtils.Bot):
         self.bot = bot
 
-    @commands.command(name="addq")
-    @commands.is_owner()
+    @app_commands.command(name="addq")
+    @app_commands.describe(
+        question="Question to ask",
+        correct="The correct answer",
+        wrong_one="Wrong answer #1",
+        wrong_two="Wrong answer #2",
+        wrong_three="Wrong answer #3",
+        category="Season/category",
+    )
+    @app_commands.guilds(*map(int, os.getenv("SLASH_GUILDS").split("|")))
+    @is_owner()
     async def addq(
         self,
-        ctx: DPyUtils.Context,
-        question: str = commands.Option(description="Question to ask"),
-        correct: str = commands.Option(description="The correct answer"),
-        wrong_one: str = commands.Option(description="Wrong answer #1"),
-        wrong_two: str = commands.Option(description="Wrong answer #2", default="null"),
-        wrong_three: str = commands.Option(
-            description="Wrong answer #3", default="null"
-        ),
+        ctx: discord.Interaction,
+        question: str,
+        correct: str,
+        wrong_one: str,
+        wrong_two: str = "null",
+        wrong_three: str = "null",
+        category: str = "null",
     ):
         """
         Add a question to the list of questions.
         """
-        if ctx.author.id != 642416218967375882:
-            return await ctx.send("no ty :)", ephemeral=True)
+        if ctx.user.id != 642416218967375882:
+            return await ctx.response.send_message("no ty :)", ephemeral=True)
         async with self.bot.db.cursor() as c:
             await c.execute(
-                "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
-                (question, correct, wrong_one, wrong_two, wrong_three),
+                "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three, category) VALUES (?, ?, ?, ?, ?, ?)",
+                (question, correct, wrong_one, wrong_two, wrong_three, category),
             )
         await self.bot.db.commit()
-        await ctx.send(
+        await ctx.response.send_message(
             embed=self.bot.Embed(
                 title="Question Added",
                 description=f"Added `{question}` to the list of questions.",
@@ -46,24 +58,11 @@ class Owner(
             .add_field(
                 name="Wrong Answers",
                 value=f"• {wrong_one}\n• {wrong_two}\n• {wrong_three}",
-            ),
+            )
+            .add_field(name="Category", value=category),
             ephemeral=True,
         )
 
-    @commands.command(name="setversion")
-    @commands.is_owner()
-    async def setversion(self, ctx: DPyUtils.Context, version: str):
-        """
-        Set the Version of the Bot
-        """
-        embed = self.bot.Embed(
-            title="Confirmation",
-            description=f"Are you sure you want to set the version to {version}?",
-            timestamp=datetime.datetime.utcnow(),
-        ).set_author(name=f"{ctx.author.name}", icon_url=ctx.author.avatar.url)
-        v = Version(version)
-        await ctx.send(embed=embed, view=v)
 
-
-def setup(bot: DPyUtils.Bot):
-    bot.add_cog(Owner(bot))
+async def setup(bot: DPyUtils.Bot):  # pylint: disable=missing-function-docstring
+    await bot.add_cog(Owner(bot))

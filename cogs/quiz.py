@@ -2,18 +2,20 @@
 import asyncio
 import datetime
 import random
-import DPyUtils
-from DPyUtils import s
+
+import discord
+from discord import app_commands
 from discord.ext import commands
-from cogs.internal.views import Answers, ShowAnswers
+from DPyUtils import Bot, Interaction, s
+
 from cogs.internal.classes import Game
-import json
+from cogs.internal.views import Answers, ShowAnswers
 
 
 class Quiz(commands.Cog):
     """Quiz cog"""
 
-    def __init__(self, bot: DPyUtils.Bot):
+    def __init__(self, bot: Bot):
         """
         games format:
         ..code-block:: json
@@ -30,40 +32,23 @@ class Quiz(commands.Cog):
         self.bot = bot
         self.games = {}
 
-    @commands.command(name="quiz")
+    @app_commands.command(name="quiz")
+    @app_commands.describe(length="# of questions.")
     async def quiz(
         self,
-        ctx: DPyUtils.Context,
-        length: int = commands.Option(description="# of questions."),
+        interaction: Interaction,
+        length: int,
     ):
         """
         Starts a Christmas-themed quiz.
         """
+        # await interaction.response.defer()
         if length < 1:
-            return await ctx.send("You need a minimum of 1 question.")
-        self.games[ctx.guild.id] = Game(ctx)
+            return await interaction.send("You need a minimum of 1 question.")
+        self.games[interaction.guild.id] = Game(interaction)
         questions = await self.get_questions()
         qs = questions[:length]
         length = len(qs)
-        #        v = JoinStartLeave(self, length)
-        #        await ctx.send(
-        #            embed=self.bot.Embed(
-        #                title="Quiz Starting!",
-        #                description=f"Winter quiz beginning <t:{int(datetime.datetime.now().timestamp()+300)}:R>! Press the button below to join.",
-        #            )
-        #            .set_author(name=ctx.author, icon_url=ctx.author.display_avatar)
-        #            .set_footer(text=ctx.guild, icon_url=ctx.guild.icon or discord.Embed.Empty),
-        #            view=v,
-        #            ephemeral=False,
-        #        )
-        #        try:
-        #            await self.bot.wait_for(
-        #                "quiz_start",
-        #                check=lambda i, m: i == ctx.guild.id and m == ctx.author.id,
-        #                timeout=300,
-        #            )
-        #        except asyncio.TimeoutError:
-        #            pass
         for i, q in enumerate(qs):
             await asyncio.sleep(2)
             rid = q[0]
@@ -75,21 +60,17 @@ class Quiz(commands.Cog):
             cor = chr(65 + cori)
             embed = self.bot.Embed(
                 title=question,
-                description="\n\n".join(
-                    f"**{chr(65+n)}.** {a}" for n, a in enumerate(answers)
-                ),
-            ).set_footer(
-                text=f"Question {i+1}/{length} (ID: {rid}) | 15 seconds to answer!"
-            )
-            v = Answers(self, ctx.guild, answers, i)
-            await ctx.send(embed=embed, view=v)
-            self.games[ctx.guild.id].current_view = v
-            self.games[ctx.guild.id].q_start = datetime.datetime.now().timestamp()
+                description="\n\n".join(f"**{chr(65+n)}.** {a}" for n, a in enumerate(answers)),
+            ).set_footer(text=f"Question {i+1}/{length} (ID: {rid}) | 15 seconds to answer!")
+            v = Answers(self, interaction.guild, answers, i)
+            print("made it to send")
+            await interaction.send(embed=embed, view=v)
+            self.games[interaction.guild.id].current_view = v
+            self.games[interaction.guild.id].q_start = datetime.datetime.now().timestamp()
             try:
                 _, _, data = await self.bot.wait_for(
                     "next_question",
-                    check=lambda g, _i, d: g == ctx.guild.id
-                    and _i == i,  # pylint: disable=cell-var-from-loop
+                    check=lambda g, _i, d: g == interaction.guild.id and _i == i,
                     timeout=15,
                 )
             except asyncio.TimeoutError:
@@ -98,27 +79,29 @@ class Quiz(commands.Cog):
             #                lambda u: u.active, self.games[ctx.guild.id]["participants"].values()
             #            )
             nv = ShowAnswers(answers, cori)
-            await self.scoring(ctx, data, cor)
+            await self.scoring(interaction, data, cor)
             embed.description = f"__Answer:__\n**{cor}.** {q[1]}\n\n__**Scores**__"
-            embed.description += await self.fmt_scores(ctx)
-            await ctx.send(embed=embed, view=nv)
-            if not self.games[ctx.guild.id].active:
+            embed.description += await self.fmt_scores(interaction)
+            await interaction.send(embed=embed, view=nv)
+            if not self.games[interaction.guild.id].active:
                 break
         #            if not any(people):
         #                break
-        await ctx.send(
+        await interaction.send(
             embed=self.bot.Embed(
-                title="Final Scores", description=await self.fmt_scores(ctx, True)
+                title="Final Scores",
+                description=await self.fmt_scores(interaction, True),
             )
         )
-        self.games[ctx.guild.id].active = False
+        self.games[interaction.guild.id].active = False
 
     async def get_questions(self):
+        """
+        Retrieve a shuffled list of questions
+        """
         questions = []
         async with self.bot.db.cursor() as cur:
-            await cur.execute(
-                "SELECT ROWID, question, correct, wrong_one, wrong_two, wrong_three FROM questions"
-            )
+            await cur.execute("SELECT ROWID, question, correct, wrong_one, wrong_two, wrong_three FROM questions")
             data = await cur.fetchall()
             for q in data:
                 t = list(q)
@@ -128,8 +111,11 @@ class Quiz(commands.Cog):
         random.shuffle(questions)
         return questions
 
-    async def scoring(self, ctx: DPyUtils.Context, data: dict, cor: str):
-        people = self.games[ctx.guild.id].participants
+    async def scoring(self, interaction: discord.Interaction, data: dict, cor: str):
+        """
+        Calculates scores
+        """
+        people = self.games[interaction.guild.id].participants
         for uid, p in people.items():
             a, t = data.get(uid, ["", 0])
             if not a:
@@ -138,15 +124,18 @@ class Quiz(commands.Cog):
             p.answered += 1
             this_score = 0
             if a == cor:
-                this_score = round((15 - (t - self.games[ctx.guild.id].q_start)) * 4)
+                this_score = round((15 - (t - self.games[interaction.guild.id].q_start)) * 4)
                 p.score += this_score
             p.up_by = this_score
 
-    async def fmt_scores(self, ctx: DPyUtils.Context, final: bool = False):
+    async def fmt_scores(self, interaction: discord.Interaction, final: bool = False):
+        """
+        Score formatter
+        """
         scores = ""
         for i, p in enumerate(
             sorted(
-                self.games[ctx.guild.id].participants.values(),
+                self.games[interaction.guild.id].participants.values(),
                 key=lambda p: p.score,
                 reverse=True,
             ),
@@ -156,21 +145,26 @@ class Quiz(commands.Cog):
             if final and i == 1:
                 scores += f"🏆 **Winner!**\n{p.user} with {p.score} points.\n"
             else:
-                scores += (
-                    f"\n{m} `{p.score}` point{s(p.score)} (`+{p.up_by}`): {p.user}"
-                )
+                scores += f"\n{m} `{p.score}` point{s(p.score)} (`+{p.up_by}`): {p.user}"
         return scores
 
-    @commands.command(name="endquiz")
-    @commands.has_permissions(manage_messages=True)
-    async def endquiz(self, ctx: DPyUtils.Context):
-        if not self.games.get(ctx.guild.id, None) or (
-            self.games.get(ctx.guild.id, None) and not self.games[ctx.guild.id].active
+    @app_commands.command(name="endquiz")
+    async def endquiz(self, interaction: discord.Interaction):
+        """
+        Ends the active quiz.
+        """
+        if not self.games.get(interaction.guild.id, None) or (
+            self.games.get(interaction.guild.id, None) and not self.games[interaction.guild.id].active
         ):
-            return await ctx.send("There is no quiz currently running!", ephemeral=True)
-        await self.games[ctx.guild.id].end()
-        await ctx.send(f"*Quiz ended by {ctx.author}*")
+            return await interaction.send("There is no quiz currently running!", ephemeral=True)
+        g: Game = self.games[interaction.guild.id]
+        if not (
+            interaction.channel.permissions_for(interaction.user).manage_messages or interaction.user.id == g.start_by
+        ):
+            raise commands.MissingPermissions("manage_messages")
+        await self.games[interaction.guild.id].end()
+        await interaction.send(f"*Quiz ended by {interaction.user}*")
 
 
-def setup(bot: DPyUtils.Bot):
-    bot.add_cog(Quiz(bot))
+async def setup(bot: Bot):
+    await bot.add_cog(Quiz(bot))
