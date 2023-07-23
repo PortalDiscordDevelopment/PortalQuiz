@@ -29,12 +29,6 @@ class QuizBot(PortalUtils.Bot):
         self.session: aiohttp.ClientSession
         self.version = 2.1
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.db: aiosqlite.Connection
-        self.session: aiohttp.ClientSession
-        self.version = 2.1
-
     async def start(self, *args, **kwargs):
         async with aiosqlite.connect("data.db") as db:
             self.db = db
