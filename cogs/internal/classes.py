@@ -1,6 +1,6 @@
-import discord
-import DPyUtils
 from dataclasses import dataclass
+
+import discord
 
 
 @dataclass
@@ -23,11 +23,11 @@ class Game:
     Game class.
     """
 
-    def __init__(self, ctx: DPyUtils.Context):
+    def __init__(self, interaction: discord.Interaction):
         self.active = True
-        self.start_by = ctx.author.id
+        self.start_by = interaction.user.id
         self.participants = {}
-        self.guild = ctx.guild
+        self.guild = interaction.guild
         self.current_view: discord.ui.View
 
     async def end(self):

@@ -6,6 +6,7 @@ schemas = [
     correct TEXT NOT NULL,
     wrong_one TEXT NOT NULL,
     wrong_two TEXT NOT NULL,
-    wrong_three TEXT NOT NULL
+    wrong_three TEXT NOT NULL,
+    category TEXT NOT NULL
 )"""
 ]
