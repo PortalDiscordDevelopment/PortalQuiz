@@ -1,5 +1,4 @@
 aiosqlite
-aiohttp
 git+https://github.com/clari7744/DPyUtils
 git+https://github.com/clari7744/jishaku
 git+https://github.com/PortalDiscordDevelopment/PortalUtils

@@ -1,9 +1,9 @@
 import datetime
 
-from discord import Button, ButtonStyle, Guild, ui
+from discord import Button, ButtonStyle, Guild, Interaction, ui
 from discord.ext import commands
-from DPyUtils import Interaction
-from PortalUtils import Bot
+
+from quizbot import QuizBot
 
 from .classes import Player
 
@@ -134,7 +134,7 @@ class ShowAnswers(ui.View):
 class AcceptSuggestion(ui.View):
     def __init__(
         self,
-        bot: Bot,
+        bot: QuizBot,
         suggester_id: int,
         question: str,
         correct: str,

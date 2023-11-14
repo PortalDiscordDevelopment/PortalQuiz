@@ -1,9 +1,10 @@
 import sys
 
 import discord
-from discord import app_commands
+from discord import Interaction, Permissions, app_commands, ui, utils
 from discord.ext import commands
-from DPyUtils import Bot, Interaction
+from quizbot import QuizBot
+
 
 # from cogs.internal.views import AcceptSuggestion
 
@@ -13,7 +14,7 @@ class Misc(commands.Cog):
     Other commands.
     """
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: QuizBot):
         self.bot = bot
 
     @app_commands.command(name="info")
@@ -21,13 +22,13 @@ class Misc(commands.Cog):
         """
         Shows information about the bot.
         """
-        view = discord.ui.View()
+        view = ui.View()
         for n, u in {
             "Upvote Me": f"https://top.gg/bot/{self.bot.user.id}/vote",
-            "Support Server": "https://discord.gg/cXwbSJHuxh",
-            "Invite Me": discord.utils.oauth_url(self.bot.user.id, permissions=discord.Permissions(412317240384)),
+            "Support Server": "https://gg/cXwbSJHuxh",
+            "Invite Me": utils.oauth_url(self.bot.user.id, permissions=Permissions(412317240384)),
         }.items():
-            view.add_item(discord.ui.Button(label=n, url=u))
+            view.add_item(ui.Button(label=n, url=u))
 
         await interaction.send(
             embed=self.bot.Embed(title="Portal Quiz Info")
@@ -35,7 +36,7 @@ class Misc(commands.Cog):
                 name="Stats",
                 value=f"""
                     Portal Quiz Version: `{self.bot.version}`
-                    Framework: [discord.py](https://github.com/Rapptz/discord.py)
+                    Framework: [discord.py](https://github.com/clari7744/discord.py)
                     discord.py Version: `{discord.__version__}`
                     Python Version: `{sys.version}`
                     Server Count: `{len(self.bot.guilds)} servers`
@@ -106,5 +107,5 @@ class Misc(commands.Cog):
         )
 
 
-async def setup(bot: commands.Bot):
+async def setup(bot: QuizBot):
     await bot.add_cog(Misc(bot))

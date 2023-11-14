@@ -3,22 +3,23 @@ import asyncio
 import datetime
 import random
 
-import discord
-from discord import app_commands
+from discord import Interaction, app_commands
 from discord.ext import commands
-from DPyUtils import Bot, Interaction, s
+from DPyUtils import s
 
 from cogs.internal.classes import Game
 from cogs.internal.views import Answers, ShowAnswers
+from quizbot import QuizBot
 
 
 class Quiz(commands.Cog):
     """Quiz cog"""
 
-    def __init__(self, bot: Bot):
+    def __init__(self, bot: QuizBot):
         """
         games format:
-        ..code-block:: json
+
+        .. code-block:: python3
             {
                 guild_id: {
                     "active": bool,
@@ -111,7 +112,7 @@ class Quiz(commands.Cog):
         random.shuffle(questions)
         return questions
 
-    async def scoring(self, interaction: discord.Interaction, data: dict, cor: str):
+    async def scoring(self, interaction: Interaction, data: dict, cor: str):
         """
         Calculates scores
         """
@@ -128,7 +129,7 @@ class Quiz(commands.Cog):
                 p.score += this_score
             p.up_by = this_score
 
-    async def fmt_scores(self, interaction: discord.Interaction, final: bool = False):
+    async def fmt_scores(self, interaction: Interaction, final: bool = False):
         """
         Score formatter
         """
@@ -149,7 +150,7 @@ class Quiz(commands.Cog):
         return scores
 
     @app_commands.command(name="endquiz")
-    async def endquiz(self, interaction: discord.Interaction):
+    async def endquiz(self, interaction: Interaction):
         """
         Ends the active quiz.
         """
@@ -166,5 +167,5 @@ class Quiz(commands.Cog):
         await interaction.send(f"*Quiz ended by {interaction.user}*")
 
 
-async def setup(bot: Bot):
+async def setup(bot: QuizBot):
     await bot.add_cog(Quiz(bot))

@@ -1,10 +1,9 @@
 """owner-only commands"""
 import os
 
-import discord
-import DPyUtils
-from discord import app_commands
+from discord import app_commands, Interaction
 from discord.ext import commands
+from quizbot import QuizBot
 
 from cogs.internal.checks import is_owner
 
@@ -14,7 +13,7 @@ class Owner(commands.Cog):
     Owner commands
     """
 
-    def __init__(self, bot: DPyUtils.Bot):
+    def __init__(self, bot: QuizBot):
         self.bot = bot
 
     @app_commands.command(name="addq")
@@ -30,7 +29,7 @@ class Owner(commands.Cog):
     @is_owner()
     async def addq(
         self,
-        ctx: discord.Interaction,
+        ctx: Interaction,
         question: str,
         correct: str,
         wrong_one: str,
@@ -64,5 +63,5 @@ class Owner(commands.Cog):
         )
 
 
-async def setup(bot: DPyUtils.Bot):  # pylint: disable=missing-function-docstring
+async def setup(bot: QuizBot):  # pylint: disable=missing-function-docstring
     await bot.add_cog(Owner(bot))
