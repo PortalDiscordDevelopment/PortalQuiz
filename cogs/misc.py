@@ -25,7 +25,7 @@ class Misc(commands.Cog):
         view = ui.View()
         for n, u in {
             "Upvote Me": f"https://top.gg/bot/{self.bot.user.id}/vote",
-            "Support Server": "https://gg/cXwbSJHuxh",
+            "Support Server": "https://discord.gg/cXwbSJHuxh",
             "Invite Me": utils.oauth_url(self.bot.user.id, permissions=Permissions(412317240384)),
         }.items():
             view.add_item(ui.Button(label=n, url=u))
