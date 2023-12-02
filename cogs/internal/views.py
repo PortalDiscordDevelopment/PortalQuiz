@@ -137,6 +137,7 @@ class AcceptSuggestion(ui.View):
         bot: QuizBot,
         suggester_id: int,
         question: str,
+        category: str,
         correct: str,
         wrong_one: str,
         wrong_two="null",
@@ -145,6 +146,7 @@ class AcceptSuggestion(ui.View):
     ):
         super().__init__(**kwargs)
         self.bot = bot
+        self.category = category
         self.question = question
         self.correct = correct
         self.wrong_one = wrong_one
@@ -158,14 +160,8 @@ class AcceptSuggestion(ui.View):
             return await interaction.send("no ty :)", ephemeral=True)
         async with self.bot.db.cursor() as c:
             await c.execute(
-                "INSERT INTO questions(question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
-                (
-                    self.question,
-                    self.correct,
-                    self.wrong_one,
-                    self.wrong_two,
-                    self.wrong_three,
-                ),
+                "INSERT INTO questions(category, question, correct, wrong_one, wrong_two, wrong_three) VALUES (?, ?, ?, ?, ?)",
+                (self.category, self.question, self.correct, self.wrong_one, self.wrong_two, self.wrong_three),
             )
         await self.bot.db.commit()
         await interaction.send(

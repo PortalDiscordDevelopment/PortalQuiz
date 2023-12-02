@@ -4,6 +4,20 @@ import discord
 
 
 @dataclass
+class Question:
+    """
+    Question class.
+    """
+
+    def __init__(self, qid: int, category: str, question: str, correct_answer: str, *wrong_answers: str):
+        self.id = qid
+        self.category = category
+        self.question = question
+        self.correct_answer = correct_answer
+        self.wrong_answers = tuple(a for a in wrong_answers if a != "null")
+
+
+@dataclass
 class Player:
     """
     Player class.
@@ -26,7 +40,7 @@ class Game:
     def __init__(self, interaction: discord.Interaction):
         self.active = True
         self.start_by = interaction.user.id
-        self.participants = {}
+        self.participants: dict[int, Player] = {}
         self.guild = interaction.guild
         self.current_view: discord.ui.View
 
