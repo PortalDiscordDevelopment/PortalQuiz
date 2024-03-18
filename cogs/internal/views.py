@@ -1,6 +1,6 @@
 import datetime
 
-from discord import Button, ButtonStyle, Guild, Interaction, ui
+from discord import ButtonStyle, Guild, Interaction, ui
 from discord.ext import commands
 
 from quizbot import QuizBot
@@ -74,7 +74,7 @@ class JoinStartLeave(ui.View):
         self.add_item(Leave(self.cog))
 
     @ui.button(label="Join", style=ButtonStyle(3))
-    async def join_game(self, btn: Button, interaction: Interaction):
+    async def join_game(self, interaction: Interaction, btn: ui.Button):
         # await interaction.response.defer()
         if self.cog.games[interaction.guild.id]["participants"].get(interaction.user.id, None):
             return await interaction.send("You are already in this game.", ephemeral=True)
@@ -82,7 +82,7 @@ class JoinStartLeave(ui.View):
         await interaction.send("Joined the game.", ephemeral=True)
 
     @ui.button(label="Start", style=ButtonStyle(1))
-    async def start_game(self, btn: Button, interaction: Interaction):
+    async def start_game(self, interaction: Interaction, btn: ui.Button):
         # await interaction.response.defer()
         if self.cog.games[interaction.guild_id]["start_by"] != interaction.user.id:
             return await interaction.send(
@@ -155,7 +155,7 @@ class AcceptSuggestion(ui.View):
         self.suggester_id = suggester_id
 
     @ui.button(label="Yes", style=ButtonStyle(3))
-    async def yes(self, btn: Button, interaction: Interaction):
+    async def yes(self, interaction: Interaction, btn: ui.Button):
         if interaction.user.id != 642416218967375882:
             return await interaction.send("no ty :)", ephemeral=True)
         async with self.bot.db.cursor() as c:
@@ -193,7 +193,7 @@ class AcceptSuggestion(ui.View):
         self.stop()
 
     @ui.button(label="No", style=ButtonStyle(4))
-    async def no(self, btn: Button, interaction: Interaction):
+    async def no(self, interaction: Interaction, btn: ui.Button):
         await interaction.send("Suggestion not accepted.")
         embed = self.bot.Embed(
             title="Suggestion not accepted",
