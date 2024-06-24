@@ -1,11 +1,11 @@
 """owner-only commands"""
 import os
 
-from discord import app_commands, Interaction
+from discord import Interaction, app_commands
 from discord.ext import commands
-from quizbot import QuizBot
 
 from cogs.internal.checks import is_owner
+from quizbot import QuizBot
 
 
 class Owner(commands.Cog):

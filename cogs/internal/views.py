@@ -188,7 +188,7 @@ class AcceptSuggestion(ui.View):
         )
         try:
             await self.bot.get_user(self.suggester_id).send(embed=em)
-        except:
+        except:  # noqa: E722
             pass
         self.stop()
 
@@ -207,6 +207,6 @@ class AcceptSuggestion(ui.View):
         )
         try:
             await self.bot.get_user(self.suggester_id).send(embed=embed)
-        except:
+        except:  # noqa: E722
             pass
         self.stop()

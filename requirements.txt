@@ -1,7 +1,8 @@
-aiosqlite
-git+https://github.com/clari7744/DPyUtils
-git+https://github.com/clari7744/jishaku
-git+https://github.com/PortalDiscordDevelopment/PortalUtils
-git+https://github.com/clari7744/discord.py
-python-dotenv
-python-i18n
+aiohttp[speedups]~=3.9
+aiosqlite~=0.20
+black~=24.4
+discord.py @ git+https://github.com/clari7744/discord.py@69de4a0a
+DPyUtils @ git+https://github.com/clari7744/DPyUtils@8e18ea0
+jishaku @ git+https://github.com/clari7744/jishaku@93608fc
+PortalUtils @ git+https://github.com/PortalDiscordDevelopment/PortalUtils@05da350
+python-dotenv~=1.0

@@ -1,1 +1,1 @@
-from . import classes, views
+from . import classes, views  # noqa: F401

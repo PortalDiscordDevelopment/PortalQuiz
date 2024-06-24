@@ -1,5 +1,11 @@
-*.db
-*.json
-*.env
+# Data
+data.db
+data.json
+
+# Temporary
 __pycache__
 venv
+
+# Config
+.env
+config.py

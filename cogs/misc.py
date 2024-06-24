@@ -3,8 +3,8 @@ import sys
 import discord
 from discord import Interaction, Permissions, app_commands, ui, utils
 from discord.ext import commands
-from quizbot import QuizBot
 
+from quizbot import QuizBot
 
 # from cogs.internal.views import AcceptSuggestion
 
